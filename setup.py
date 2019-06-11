@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="path-planning-kholysa",
-    version="0.0.5",
+    version="0.0.6",
     author="Saif Elkholy",
     author_email="saif.elkholy@mail.mcgill.com",
     description="A package using the A* algorithm to plan a path for a quadcopter",
