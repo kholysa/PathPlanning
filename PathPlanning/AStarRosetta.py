@@ -42,7 +42,7 @@ class AStarGraph(object):
         return 1  # Normal movement cost
 
 
-def AStarSearch(start, end, graph):
+def AStarSearch(start, end, graph, display=False):
     G = {}  # Actual movement cost to each position from the start position
     F = {}  # Estimated movement cost of start to end going via this position
 
@@ -103,6 +103,14 @@ def AStarSearch(start, end, graph):
             elif state is 1:
                 combinedResults.append((delta, 0))
 
+            if display:
+                plt.plot([v[0] for v in path], [v[1] for v in path])
+                for barrier in graph.barriers:
+                    plt.plot([v[0] for v in barrier], [v[1] for v in barrier])
+                plt.xlim(-1, 8)
+                plt.ylim(-1, 8)
+                plt.show()
+
             return combinedResults, F[end], path  # Done!
 
         # Mark the current vertex as closed
@@ -135,13 +143,7 @@ if __name__ == "__main__":
                         [(2, 4), (2, 5), (2, 6), (3, 6), (4, 6), (5, 6), (5, 5), (5, 4), (5, 3), (5, 2), (4, 2), (3, 2)]])
     start = (4,5)
     end = (7,7)
-    distances, cost, result = AStarSearch(start, end , graph)
+    distances, cost, result = AStarSearch(start, end, graph, True)
 
     print("route", distances)
     print("cost", cost)
-    plt.plot([v[0] for v in result], [v[1] for v in result])
-    for barrier in graph.barriers:
-        plt.plot([v[0] for v in barrier], [v[1] for v in barrier])
-    plt.xlim(-1, 8)
-    plt.ylim(-1, 8)
-    plt.show()
