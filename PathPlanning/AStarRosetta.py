@@ -1,14 +1,16 @@
 from __future__ import print_function
 from decimal import Decimal
-from numpy import round
+from numpy import round, subtract
 import matplotlib.pyplot as plt
+
 
 
 class AStarGraph(object):
     # Define a class board like grid with two barriers
 
-    def __init__(self, walls):
+    def __init__(self, walls, stepSize):
         self.barriers = []
+        self.stepSize = stepSize
         for wall in walls:
             self.barriers.append(wall)
 
@@ -24,7 +26,7 @@ class AStarGraph(object):
         n = []
         # Moves allow link a chess king
         # for dx, dy in [(1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (-1, 1), (1, -1), (-1, -1)]:
-        for dx, dy in [(0.1, 0), (-0.1, 0), (0, 0.1), (0, -0.1)]:
+        for dx, dy in [(self.stepSize, 0), (-self.stepSize, 0), (0, self.stepSize), (0, -self.stepSize)]:
             x2 = round(pos[0] + dx, 2)
             y2 = round(pos[1] + dy, 2)
             n.append((x2, y2))
@@ -39,7 +41,12 @@ class AStarGraph(object):
         return 1  # Normal movement cost
 
 
-def AStarSearch(start, end, graph, display=False):
+def AStarSearch(start, end, graph, stepSize, display=False):
+
+    difference = subtract(end, start)
+    if not (difference[0]/stepSize).is_integer() or not (difference[1]/stepSize).is_integer():
+        raise Exception("The goal is not reachable from the starting position given the step size")
+
     G = {}  # Actual movement cost to each position from the start position
     F = {}  # Estimated movement cost of start to end going via this position
 
@@ -138,35 +145,36 @@ if __name__ == "__main__":
     barrierA = list()
     barrierB = list()
     barrierC = list()
-
+    stepSizeBarriers = 0.1
     for i in range(21):
-        stepSize = round(i * 0.1, 2)
+        stepSize = round(i * stepSizeBarriers, 2)
         barrierA.append((stepSize, 5.0))
 
     for i in range(21):
-        stepSize = round(i * 0.1, 2)
+        stepSize = round(i * stepSizeBarriers, 2)
         barrierB.append((4.0, 3 + stepSize))
 
     for i in range(21):
-        stepSize = round(i * 0.1, 2)
+        stepSize = round(i * stepSizeBarriers, 2)
         barrierC.append((2.0, 4 + stepSize))
 
     for i in range(31):
-        stepSize = round(i * 0.1, 2)
+        stepSize = round(i * stepSizeBarriers, 2)
         barrierC.append((2 + stepSize, 6.0))
 
     for i in range(41):
-        stepSize = round(i * 0.1, 2)
+        stepSize = round(i * stepSizeBarriers, 2)
         barrierC.append((5.0, 6 - stepSize))
 
     for i in range(21):
-        stepSize = round(i * 0.1, 2)
+        stepSize = round(i * stepSizeBarriers, 2)
         barrierC.append((3 + stepSize, 2.0))
 
     barriers.append(barrierA)
     barriers.append(barrierB)
     barriers.append(barrierC)
 
+    stepSize = 0.5
     # graph = AStarGraph([    [(2, 5), (1, 5), (0, 5)],
     #
     #                         [(4, 3), (4, 4), (4, 5)],
@@ -176,10 +184,11 @@ if __name__ == "__main__":
     #                          (5, 5), (5, 4), (5, 3), (5, 2),
     #                          (4, 2), (3, 2)]
     #                     ])
-    graph = AStarGraph(barriers)
+    graph = AStarGraph(barriers, stepSize)
     start = (3.5,5)
     end = (7.5,7.5)
-    distances, cost, result = AStarSearch(start, end, graph, True)
+    distances, cost, result = AStarSearch(start, end, graph, stepSize, True)
 
     print("route", distances)
+    print("coordiantes ", result)
     print("cost", cost)
