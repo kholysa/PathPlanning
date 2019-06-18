@@ -1,4 +1,5 @@
 from __future__ import print_function
+from decimal import Decimal
 import matplotlib.pyplot as plt
 
 
@@ -13,11 +14,6 @@ class AStarGraph(object):
     def heuristic(self, start, goal):
         # Use Chebyshev distance heuristic if we can move one square either
         # adjacent or diagonal
-        # D = 1
-        # D2 = 1
-        # dx = abs(start[0] - goal[0])
-        # dy = abs(start[1] - goal[1])
-        # return D * (dx + dy) + (D2 - 2 * D) * min(dx, dy)
         D = 1
         dx = abs(start[0] - goal[0])
         dy = abs(start[1] - goal[1])
@@ -72,7 +68,6 @@ def AStarSearch(start, end, graph, display=False):
                 path.append(current)
             path.reverse()
             prevTarget = path[0]
-            lastTarget = path[-1]
             iterResult = iter(path)
             next(iterResult)
             state = 0
@@ -80,18 +75,18 @@ def AStarSearch(start, end, graph, display=False):
 
             delta = 0
             for target in iterResult:
-                if target[0] - prevTarget[0] is 0 and state is 0:
+                if Decimal(target[0]) - Decimal(prevTarget[0]) == 0 and state is 0:
                     state = 0
                     delta += target[1] - prevTarget[1]
-                elif target[0] - prevTarget[0] is 0 and state is 1:
+                elif Decimal(target[0]) - Decimal(prevTarget[0]) == 0 and state is 1:
                     state = 0
                     combinedResults.append((delta, 0))
                     delta = 0
                     delta += target[1] - prevTarget[1]
-                elif target[1] - prevTarget[1] is 0 and state is 1:
+                elif Decimal(target[1]) - Decimal(prevTarget[1]) == 0 and state is 1:
                     state = 1
                     delta += target[0] - prevTarget[0]
-                elif target[1] - prevTarget[1] is 0 and state is 0:
+                elif Decimal(target[1]) - Decimal(prevTarget[1]) == 0 and state is 0:
                     state = 1
                     combinedResults.append((0, delta))
                     delta = 0
