@@ -23,18 +23,16 @@ class AStarGraph(object):
         n = []
         # Moves allow link a chess king
         # for dx, dy in [(1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (-1, 1), (1, -1), (-1, -1)]:
-        for dx, dy in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
+        for dx, dy in [(100, 0), (-100, 0), (0, 100), (0, -100)]:
             x2 = pos[0] + dx
             y2 = pos[1] + dy
-            if x2 < 0 or x2 > 7 or y2 < 0 or y2 > 7:
-                continue
             n.append((x2, y2))
         return n
 
     def move_cost(self, a, b):
         for barrier in self.barriers:
             if b in barrier:
-                return 100  # Extremely high cost to enter barrier squares
+                return 10000  # Extremely high cost to enter barrier squares
         return 1  # Normal movement cost
 
 
@@ -102,8 +100,9 @@ def AStarSearch(start, end, graph, display=False):
                 plt.plot([v[0] for v in path], [v[1] for v in path])
                 for barrier in graph.barriers:
                     plt.plot([v[0] for v in barrier], [v[1] for v in barrier])
-                plt.xlim(-1, 8)
-                plt.ylim(-1, 8)
+                plt.xlim(-100, 800)
+                plt.ylim(-100, 800)
+                plt.savefig("chart.png", bbox_inches='tight')
                 plt.show()
 
             return combinedResults, F[end], path  # Done!
@@ -133,11 +132,24 @@ def AStarSearch(start, end, graph, display=False):
 
 
 if __name__ == "__main__":
-    graph = AStarGraph([[(2, 5), (1, 5), (0, 5)]
-                           , [(4, 3), (4, 4), (4, 5)],
-                        [(2, 4), (2, 5), (2, 6), (3, 6), (4, 6), (5, 6), (5, 5), (5, 4), (5, 3), (5, 2), (4, 2), (3, 2)]])
-    start = (4,5)
-    end = (7,7)
+    barriers = list()
+    barrierA = list()
+    barrierB = list()
+    barrierC = list()
+    for i in range(300):
+        barrierA.append((0 * 100 + i, 500))
+    for i in range(300):
+        barrierB.append((400, 3 * 100 + i))
+    for i in range(700):
+        barrierC.append((2 * 100 + i, 600))
+
+    barriers.append(barrierA)
+    barriers.append(barrierB)
+    barriers.append(barrierC)
+    graph = AStarGraph(barriers)
+
+    start = (350,500)
+    end = (700,700)
     distances, cost, result = AStarSearch(start, end, graph, True)
 
     print("route", distances)
