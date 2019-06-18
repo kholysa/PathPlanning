@@ -1,5 +1,6 @@
 from __future__ import print_function
 from decimal import Decimal
+from numpy import round
 import matplotlib.pyplot as plt
 
 
@@ -23,16 +24,18 @@ class AStarGraph(object):
         n = []
         # Moves allow link a chess king
         # for dx, dy in [(1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (-1, 1), (1, -1), (-1, -1)]:
-        for dx, dy in [(100, 0), (-100, 0), (0, 100), (0, -100)]:
-            x2 = pos[0] + dx
-            y2 = pos[1] + dy
+        for dx, dy in [(0.1, 0), (-0.1, 0), (0, 0.1), (0, -0.1)]:
+            x2 = round(pos[0] + dx, 2)
+            y2 = round(pos[1] + dy, 2)
             n.append((x2, y2))
         return n
 
     def move_cost(self, a, b):
+        b = (round(b[0], 2), round(b[1], 2))
         for barrier in self.barriers:
             if b in barrier:
-                return 10000  # Extremely high cost to enter barrier squares
+                import numpy as np
+                return 100000000000000  # Extremely high cost to enter barrier squares
         return 1  # Normal movement cost
 
 
@@ -58,7 +61,7 @@ def AStarSearch(start, end, graph, display=False):
                 current = pos
 
         # Check if we have reached the goal
-        if current == end:
+        if round(current[0],2) == round(end[0],2) and round(current[1],2) == round(end[1],2):
             # Retrace our route backward
             path = [current]
             while current in cameFrom:
@@ -73,18 +76,18 @@ def AStarSearch(start, end, graph, display=False):
 
             delta = 0
             for target in iterResult:
-                if Decimal(target[0]) - Decimal(prevTarget[0]) == 0 and state is 0:
+                if target[0] - prevTarget[0] == 0 and state is 0:
                     state = 0
                     delta += target[1] - prevTarget[1]
-                elif Decimal(target[0]) - Decimal(prevTarget[0]) == 0 and state is 1:
+                elif target[0] - prevTarget[0] == 0 and state is 1:
                     state = 0
                     combinedResults.append((delta, 0))
                     delta = 0
                     delta += target[1] - prevTarget[1]
-                elif Decimal(target[1]) - Decimal(prevTarget[1]) == 0 and state is 1:
+                elif target[1] - prevTarget[1] == 0 and state is 1:
                     state = 1
                     delta += target[0] - prevTarget[0]
-                elif Decimal(target[1]) - Decimal(prevTarget[1]) == 0 and state is 0:
+                elif target[1]  - prevTarget[1] == 0 and state is 0:
                     state = 1
                     combinedResults.append((0, delta))
                     delta = 0
@@ -100,9 +103,8 @@ def AStarSearch(start, end, graph, display=False):
                 plt.plot([v[0] for v in path], [v[1] for v in path])
                 for barrier in graph.barriers:
                     plt.plot([v[0] for v in barrier], [v[1] for v in barrier])
-                plt.xlim(-100, 800)
-                plt.ylim(-100, 800)
-                plt.savefig("chart.png", bbox_inches='tight')
+                plt.xlim(-1, 8)
+                plt.ylim(-1, 8)
                 plt.show()
 
             return combinedResults, F[end], path  # Done!
@@ -136,20 +138,47 @@ if __name__ == "__main__":
     barrierA = list()
     barrierB = list()
     barrierC = list()
-    for i in range(300):
-        barrierA.append((0 * 100 + i, 500))
-    for i in range(300):
-        barrierB.append((400, 3 * 100 + i))
-    for i in range(700):
-        barrierC.append((2 * 100 + i, 600))
+
+    for i in range(21):
+        stepSize = round(i * 0.1, 2)
+        barrierA.append((stepSize, 5.0))
+
+    for i in range(21):
+        stepSize = round(i * 0.1, 2)
+        barrierB.append((4.0, 3 + stepSize))
+
+    for i in range(21):
+        stepSize = round(i * 0.1, 2)
+        barrierC.append((2.0, 4 + stepSize))
+
+    for i in range(31):
+        stepSize = round(i * 0.1, 2)
+        barrierC.append((2 + stepSize, 6.0))
+
+    for i in range(41):
+        stepSize = round(i * 0.1, 2)
+        barrierC.append((5.0, 6 - stepSize))
+
+    for i in range(21):
+        stepSize = round(i * 0.1, 2)
+        barrierC.append((3 + stepSize, 2.0))
 
     barriers.append(barrierA)
     barriers.append(barrierB)
     barriers.append(barrierC)
-    graph = AStarGraph(barriers)
 
-    start = (350,500)
-    end = (700,700)
+    # graph = AStarGraph([    [(2, 5), (1, 5), (0, 5)],
+    #
+    #                         [(4, 3), (4, 4), (4, 5)],
+    #
+    #                         [(2, 4), (2, 5), (2, 6),
+    #                          (3, 6), (4, 6), (5, 6),
+    #                          (5, 5), (5, 4), (5, 3), (5, 2),
+    #                          (4, 2), (3, 2)]
+    #                     ])
+    graph = AStarGraph(barriers)
+    start = (3.5,5)
+    end = (7.5,7.5)
     distances, cost, result = AStarSearch(start, end, graph, True)
 
     print("route", distances)
