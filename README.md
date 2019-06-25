@@ -21,6 +21,7 @@ Requires:
 
   c)
     i. (Linux only, required)Run this command source `myenv\Scripts\activate` to source the virtual environment's python installation. Your terminal should now show your venvName before each line.
+    
     ii. (Windows only, required)Run this command source `bin/activate` to source the virtual environment's python installation. Your terminal should now show your venvName before each line.
 
   2) Install the requried pip packages. Run the Instructions below
