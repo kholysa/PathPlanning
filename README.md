@@ -20,6 +20,7 @@ Requires:
   b) Run this command cd `venvName` to move into the virtual environement.
 
   c)
+  
     i. (Linux only, required)Run this command source `myenv\Scripts\activate` to source the virtual environment's python installation. Your terminal should now show your venvName before each line.
     
     ii. (Windows only, required)Run this command source `bin/activate` to source the virtual environment's python installation. Your terminal should now show your venvName before each line.
