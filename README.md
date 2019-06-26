@@ -30,3 +30,20 @@ Requires:
   a) (Linux only, optional)Run this command `which pip`. Make sure the output points to a file that is in your venv.
 
   b) Run this command `pip install matplotlib numpy` to install the required packages.
+  
+## How to use in CopterMove script
+
+### Steps
+
+  1) Test the script
+    a) Run the script
+    b) Make sure that the output on the graph looks good
+  
+  2) Package into a library and upload to the "Pypi" library repository; full documentation is here https://packaging.python.org/tutorials/packaging-projects/
+    a) `python3 setup.py sdist bdist_wheel`
+    b) `pip install twine`
+    c) Increment the version number in `setup.py`
+    c) `twine upload dist/*`
+    
+  3) Install this library in the CopterMove script
+    a) Step `3)a)` here https://github.com/kholysa/CopterMove#linux-and-macos-environments 
