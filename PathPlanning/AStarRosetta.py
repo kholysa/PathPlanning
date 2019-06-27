@@ -36,7 +36,6 @@ class AStarGraph(object):
         b = (round(b[0], 2), round(b[1], 2))
         for barrier in self.barriers:
             if b in barrier:
-                import numpy as np
                 return 100000000000000  # Extremely high cost to enter barrier squares
         return 1  # Normal movement cost
 
@@ -174,7 +173,7 @@ if __name__ == "__main__":
     barriers.append(barrierB)
     barriers.append(barrierC)
 
-    stepSize = 0.5
+    stepSize = 0.1
     # graph = AStarGraph([    [(2, 5), (1, 5), (0, 5)],
     #
     #                         [(4, 3), (4, 4), (4, 5)],
@@ -185,8 +184,8 @@ if __name__ == "__main__":
     #                          (4, 2), (3, 2)]
     #                     ])
     graph = AStarGraph(barriers, stepSize)
-    start = (3.5,5)
-    end = (7.5,7.5)
+    start = (2.8,2.9)
+    end = (2.3,7.9)
     distances, cost, result = AStarSearch(start, end, graph, stepSize, True)
 
     print("route", distances)
