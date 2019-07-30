@@ -8,9 +8,8 @@ import matplotlib.pyplot as plt
 class AStarGraph(object):
     # Define a class board like grid with two barriers
 
-    def __init__(self, walls, stepSize):
+    def __init__(self, walls):
         self.barriers = []
-        self.stepSize = stepSize
         for wall in walls:
             self.barriers.append(wall)
 
@@ -26,7 +25,7 @@ class AStarGraph(object):
         n = []
         # Moves allow link a chess king
         # for dx, dy in [(1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (-1, 1), (1, -1), (-1, -1)]:
-        for dx, dy in [(self.stepSize, 0), (-self.stepSize, 0), (0, self.stepSize), (0, -self.stepSize)]:
+        for dx, dy in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
             x2 = round(pos[0] + dx, 2)
             y2 = round(pos[1] + dy, 2)
             n.append((x2, y2))
@@ -39,12 +38,30 @@ class AStarGraph(object):
                 return 100000000000000  # Extremely high cost to enter barrier squares
         return 1  # Normal movement cost
 
+    def setPath(self, path):
+        self.path = path
 
-def AStarSearch(start, end, graph, stepSize, display=False):
+    def setJumpValues(self,jumpValues):
+        self.jumpValues = jumpValues
 
-    difference = subtract(end, start)
-    if not (difference[0]/stepSize).is_integer() or not (difference[1]/stepSize).is_integer():
-        raise Exception("The goal is not reachable from the starting position given the step size")
+    def setCost(self, cost):
+        self.cost = cost
+
+    def getCost(self):
+        return self.cost
+
+    def getJumpValues(self):
+        return self.jumpValues
+
+    def getPath(self):
+        return self.path
+
+
+def AStarSearch(start, end, graph, display=False):
+    startIsIntegers = all(isinstance(n, int) for n in start)
+    endIsIntegers = all(isinstance(n, int) for n in end)
+    if not startIsIntegers or not endIsIntegers:
+        raise Exception('The start position AND goal must be integer values')
 
     G = {}  # Actual movement cost to each position from the start position
     F = {}  # Estimated movement cost of start to end going via this position
@@ -109,11 +126,12 @@ def AStarSearch(start, end, graph, stepSize, display=False):
                 plt.plot([v[0] for v in path], [v[1] for v in path])
                 for barrier in graph.barriers:
                     plt.plot([v[0] for v in barrier], [v[1] for v in barrier])
-                plt.xlim(-1, 8)
-                plt.ylim(-1, 8)
                 plt.show()
 
-            return combinedResults, F[end], path  # Done!
+            graph.setCost(F[end])
+            graph.setJumpValues(combinedResults)
+            graph.setPath(path)
+            return # Done!
 
         # Mark the current vertex as closed
         openVertices.remove(current)
@@ -140,54 +158,20 @@ def AStarSearch(start, end, graph, stepSize, display=False):
 
 
 if __name__ == "__main__":
-    barriers = list()
-    barrierA = list()
-    barrierB = list()
-    barrierC = list()
-    stepSizeBarriers = 0.1
-    for i in range(21):
-        stepSize = round(i * stepSizeBarriers, 2)
-        barrierA.append((stepSize, 5.0))
 
-    for i in range(21):
-        stepSize = round(i * stepSizeBarriers, 2)
-        barrierB.append((4.0, 3 + stepSize))
+    graph = AStarGraph([    [(2, 5), (1, 5), (0, 5)],
 
-    for i in range(21):
-        stepSize = round(i * stepSizeBarriers, 2)
-        barrierC.append((2.0, 4 + stepSize))
+                            [(4, 3), (4, 4), (4, 5)],
 
-    for i in range(31):
-        stepSize = round(i * stepSizeBarriers, 2)
-        barrierC.append((2 + stepSize, 6.0))
+                            [(2, 4), (2, 5), (2, 6),
+                             (3, 6), (4, 6), (5, 6),
+                             (5, 5), (5, 4), (5, 3), (5, 2),
+                             (4, 2), (3, 2)]
+                        ])
+    start = (2,2)
+    end = (2,7)
+    AStarSearch(start, end, graph, True)
 
-    for i in range(41):
-        stepSize = round(i * stepSizeBarriers, 2)
-        barrierC.append((5.0, 6 - stepSize))
-
-    for i in range(21):
-        stepSize = round(i * stepSizeBarriers, 2)
-        barrierC.append((3 + stepSize, 2.0))
-
-    barriers.append(barrierA)
-    barriers.append(barrierB)
-    barriers.append(barrierC)
-
-    stepSize = 0.1
-    # graph = AStarGraph([    [(2, 5), (1, 5), (0, 5)],
-    #
-    #                         [(4, 3), (4, 4), (4, 5)],
-    #
-    #                         [(2, 4), (2, 5), (2, 6),
-    #                          (3, 6), (4, 6), (5, 6),
-    #                          (5, 5), (5, 4), (5, 3), (5, 2),
-    #                          (4, 2), (3, 2)]
-    #                     ])
-    graph = AStarGraph(barriers, stepSize)
-    start = (2.8,2.9)
-    end = (2.3,7.9)
-    distances, cost, result = AStarSearch(start, end, graph, stepSize, True)
-
-    print("route", distances)
-    print("coordiantes ", result)
-    print("cost", cost)
+    print("route", graph.getJumpValues())
+    print("coordiantes ", graph.getPath())
+    print("cost", graph.getCost())
